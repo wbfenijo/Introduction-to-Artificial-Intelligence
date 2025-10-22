@@ -59,8 +59,8 @@ class CrossWord:
             poss = poss + [(p[0], c, p[1], 'down') for p in check_line(column)]
         return poss
     
-    def get_pattern(self, pos):
-        """Return the pattern (string with letters and '_' for blanks) for a position."""
+    def get_pattern(self, pos): # pomocna metoda pre solve, forward checking, skontrolujem, ci pridanim slova mi nevznikne situacia,
+                                #ze nemam ani jednu moznosttt pre danu posiciu pos
         r, c, length, direction = pos
         pattern = ""
         for i in range(length):
@@ -72,7 +72,6 @@ class CrossWord:
         return pattern
 
     def matches_pattern(self, word, pattern):
-        """Check if a word matches a pattern (letters or '_' for blanks)."""
         return all(p == '_' or p == w for p, w in zip(pattern, word))
         
     def print_grid(self):
@@ -124,7 +123,7 @@ class CrossWord:
         """
         for r, c in coords:
             self.usage[r][c] -= 1
-            if self.usage[r][c] == 0:  
+            if self.usage[r][c] == 0:# odsttranim iba ak bola usage 1, cize bol znak pridany tymto slovom 
                 self.grid[r][c] = ' '
 
     def can_write_word(self, position, word):
@@ -141,8 +140,8 @@ class CrossWord:
 
         # # # YOUR CODE GOES HERE # # #
         row, col, length, direction = position
-        if length != len(word):
-            return False
+        # if length != len(word): #teoreticky nemusi byt, lebo v backtracku beriem len slova spravnej dlzky
+        #     return False
         
         if direction == "right":
             for i in range(length):
@@ -179,38 +178,36 @@ def solve(crossword, words):
     # # # YOUR CODE GOES HERE # # #
     positions = crossword.positions
 
-    words_by_len = {}
+    words_by_len = {}  # slovnik podla dlzky slov
     for w in words:
-        words_by_len.setdefault(len(w), []).append(w)
+        length = len(w)
+        if length not in words_by_len:
+            words_by_len[length] = []   
+        words_by_len[length].append(w) 
 
-    tried_words = {}
+    tried_words = {} #aby pri backtracku som neskusal to iste slovo, napr ak vlozim hello a potom najdem dead end a backtrackem sem,
+                    #slovnik mi zaruci, ze uz slovo hello nepouzijem
 
-    def is_forward_consistent(test_pos, test_word):
-        """Check if placing test_word leaves valid options for crossing positions."""
-        changed = crossword.write_word(test_pos, test_word)
+    def forward_checking(test_pos, test_word):
+        changed = crossword.write_word(test_pos, test_word) # ziskam pozicie doplneneho slovicka
         for pos in positions:
             length = pos[2]
-            # Get the current pattern from the grid for this position
-            pattern = crossword.get_pattern(pos)  # e.g. "C_T"
-            # Find words that could match that pattern
-            candidates = [
+            pattern = crossword.get_pattern(pos)  #zistim v akom stave je pos - pattern
+            candidates = [ # slova, ktore viem doplnit do crossword, ak doplnim test_word
                 w for w in words_by_len.get(length, [])
                 if crossword.matches_pattern(w, pattern)
             ]
-            if not candidates:
+            if not candidates: # ak nemam ziadneho kandidata, test_word nemozno pouzit
                 crossword.erase_word(changed)
                 return False
-        crossword.erase_word(changed)
+        crossword.erase_word(changed) #aby som vratil stav grid-u
         return True
 
     def backtrack():
         if not positions:
-            print("✅ Crossword solved!")
-            crossword.print_grid()
             return True
 
-        # MRV heuristic
-        best_pos = None
+        best_pos = None #  MRV
         best_candidates = []
         for pos in positions:
             length = pos[2]
@@ -218,16 +215,16 @@ def solve(crossword, words):
                 w for w in words_by_len.get(length, [])
                 if crossword.can_write_word(pos, w)
             ]
-            if not candidates:
+            if not candidates: #ak nema ziadnu moznost pre poziciu pos
                 continue
             if best_pos is None or len(candidates) < len(best_candidates):
                 best_pos = pos
                 best_candidates = candidates
 
-        if best_pos is None:
+        if best_pos is None: #ak nie je ziadny kandidat pre sucasny stav grid-u
             return False
 
-        if best_pos not in tried_words:
+        if best_pos not in tried_words: #innit slovnika
             tried_words[best_pos] = set()
 
         positions.remove(best_pos)
@@ -236,24 +233,20 @@ def solve(crossword, words):
                 continue
             tried_words[best_pos].add(word)
 
-            if not is_forward_consistent(best_pos, word):
+            if not forward_checking(best_pos, word): #ak sa nam pokazi grid vlozenim tohto word
                 continue  
             
             changed = crossword.write_word(best_pos, word)
-            print(f"Inserting '{word}' at {best_pos}")
-            crossword.print_grid()
-            print("-" * 40)
+
 
             if backtrack():
                 return True
 
             crossword.erase_word(changed)
-            print(f"Backtracking '{word}' from {best_pos}")
-            crossword.print_grid()
-            print("=" * 40)
+
 
         positions.append(best_pos)
-        tried_words[best_pos].clear()
+        tried_words[best_pos].clear() #aby ked backtrackem slovo, ktore krizuje moju poziciu mi neostali v tried words slova, ktore viem pouzit teraz
         return False
 
     backtrack()
