@@ -17,7 +17,7 @@ class CrossWord:
         """
         self.grid = grid
         self.positions = self.get_positions(grid)
-        self.usage = [[0 for _ in row] for row in grid] #aby som vedel, ci pismenko bolo pridane teraz alebo uz tam bolo
+        self.counts = [[0 for _ in row] for row in grid] #aby som vedel, ci pismenko bolo pridane teraz alebo uz tam bolo
 
     @staticmethod
     def get_positions(grid):
@@ -60,7 +60,7 @@ class CrossWord:
         return poss
     
     def get_pattern(self, pos): # pomocna metoda pre solve, forward checking, skontrolujem, ci pridanim slova mi nevznikne situacia,
-                                #ze nemam ani jednu moznosttt pre danu posiciu pos
+                                #ze nemam ani jednu moznost pre nejaku poziciu pos
         r, c, length, direction = pos
         pattern = ""
         for i in range(length):
@@ -111,7 +111,7 @@ class CrossWord:
             rr, cc = r + i * dr, c + i * dc
             self.grid[rr][cc] = word[i]
             changed.append((rr, cc))
-            self.usage[rr][cc] += 1
+            self.counts[rr][cc] += 1
         return changed
 
     def erase_word(self, coords):
@@ -122,8 +122,8 @@ class CrossWord:
             coords (list[tuple[int, int]]): List of (row, col) positions to clear.
         """
         for r, c in coords:
-            self.usage[r][c] -= 1
-            if self.usage[r][c] == 0:# odsttranim iba ak bola usage 1, cize bol znak pridany tymto slovom 
+            self.counts[r][c] -= 1
+            if self.counts[r][c] == 0:# odsttranim iba ak bola usage 1, cize bol znak pridany tymto slovom 
                 self.grid[r][c] = ' '
 
     def can_write_word(self, position, word):
@@ -179,11 +179,11 @@ def solve(crossword, words):
     positions = crossword.positions
 
     words_by_len = {}  # slovnik podla dlzky slov
-    for w in words:
-        length = len(w)
+    for word in words:
+        length = len(word)
         if length not in words_by_len:
             words_by_len[length] = []   
-        words_by_len[length].append(w) 
+        words_by_len[length].append(word) 
 
     tried_words = {} #aby pri backtracku som neskusal to iste slovo, napr ak vlozim hello a potom najdem dead end a backtrackem sem,
                     #slovnik mi zaruci, ze uz slovo hello nepouzijem
@@ -192,10 +192,10 @@ def solve(crossword, words):
         changed = crossword.write_word(test_pos, test_word) # ziskam pozicie doplneneho slovicka
         for pos in positions:
             length = pos[2]
-            pattern = crossword.get_pattern(pos)  #zistim v akom stave je pos - pattern
+            pattern = crossword.get_pattern(pos)  #zistim v akom stave je kazda volna pos - pattern
             candidates = [ # slova, ktore viem doplnit do crossword, ak doplnim test_word
-                w for w in words_by_len.get(length, [])
-                if crossword.matches_pattern(w, pattern)
+                word for word in words_by_len.get(length, [])
+                if crossword.matches_pattern(word, pattern)
             ]
             if not candidates: # ak nemam ziadneho kandidata, test_word nemozno pouzit
                 crossword.erase_word(changed)
@@ -212,8 +212,8 @@ def solve(crossword, words):
         for pos in positions:
             length = pos[2]
             candidates = [
-                w for w in words_by_len.get(length, [])
-                if crossword.can_write_word(pos, w)
+                word for word in words_by_len.get(length, [])
+                if crossword.can_write_word(pos, word)
             ]
             if not candidates: #ak nema ziadnu moznost pre poziciu pos
                 continue
