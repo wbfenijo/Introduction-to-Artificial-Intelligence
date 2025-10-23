@@ -107,6 +107,12 @@ def findPathAStar(bamhd, stopA, stopB):
     # and total path length in km.
 
     ### Your code here ###
+    
+
+
+
+
+
     print('\t{} bus stops in "OPEN list", length = {}km'.format(123, 42))
     return []
 

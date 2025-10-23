@@ -145,15 +145,11 @@ class CrossWord:
         
         if direction == "right":
             for i in range(length):
-                if self.grid[row][col + i] == "#":
-                    return False
                 if self.grid[row][col + i] != ' ' and self.grid[row][col + i] != word[i]:
                     return False
 
         else:
             for i in range(length):
-                if self.grid[row + i][col] == "#":
-                    return False
                 if self.grid[row + i][col] != ' ' and self.grid[row + i][col] != word[i]:
                     return False
         return True
@@ -200,7 +196,7 @@ def solve(crossword, words):
             if not candidates: # ak nemam ziadneho kandidata, test_word nemozno pouzit
                 crossword.erase_word(changed)
                 return False
-        crossword.erase_word(changed) #aby som vratil stav grid-u
+        crossword.erase_word(changed) #aby som obnovil stav grid-u
         return True
 
     def backtrack():
@@ -269,10 +265,9 @@ if __name__ == "__main__":
     # cw.write_word((4, 3, 4, 'right'), 'milk')
     # cw.print_grid()  # 3 words already filled in
     # print('Text at position (1,4) down: "' + cw.text_at_pos((1, 4, 5, 'down')) + '"\n\n\n')
-    now = time.time()
-    for crossword_id in range(len(grids)):
+    for crossword_id in range(len(grids)): #priemer tak 300s
         print('==== Crossword No.' + str(crossword_id + 1) + ' ====')
         cw = CrossWord(grids[crossword_id])
         solve(cw, words)
         cw.print_grid()
-    print(time.time() - now)
+

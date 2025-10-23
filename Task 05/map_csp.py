@@ -109,8 +109,8 @@ if __name__ == "__main__":
 
             ('Impossible Australia', ImpossibleMap(AustraliaMap())),
             ('Impossible USSR', ImpossibleMap(USSRMap())), # type: ignore
-            # ('Impossible USA', ImpossibleMap(USAMap())),  # TODO uncomment for solution with heuristic
-            # ('Impossible World', ImpossibleMap(WorldMap()))  # TODO uncomment for solution with heuristic
+            ('Impossible USA', ImpossibleMap(USAMap())),  # TODO uncomment for solution with heuristic
+            ('Impossible World', ImpossibleMap(WorldMap()))  # TODO uncomment for solution with heuristic
             ]
 
     for name, mapa in maps:
