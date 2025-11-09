@@ -203,29 +203,7 @@ def choose_action_automatic(world, percept):
     if 'bump' in percept:
         world.traceback.pop()
 
-    if 'scream' in percept:
-        for rr in range(len(world.mapa)):
-            for cc in range(len(world.mapa[0])):
-                kb.tell(Fact(NOT('wumpus_at', rr, cc)))
-
-    if 'glitter' in percept:
-        return world.pick, None
-
-    if world.got_gold:
-        if world.hero == world.init_hero:
-            return world.climb, None
-
-        back_r, back_c = world.traceback.pop()
-        if back_r < r and kb.ask(L('safe', r - 1, c)):
-            return world.move, 'up'
-        if back_r > r and kb.ask(L('safe', r + 1, c)):
-            return world.move, 'down'
-        if back_c < c and kb.ask(L('safe', r, c - 1)):
-            return world.move, 'left'
-        if back_c > c and kb.ask(L('safe', r, c + 1)):
-            return world.move, 'right'
-
-    if 'stench' in percept and not world.killed_wumpus and  world.arrow:
+    if 'stench' in percept and not world.killed_wumpus:
         candidates = []
         for direction, dr, dc in moves:
             nr, nc = r + dr, c + dc
@@ -241,6 +219,30 @@ def choose_action_automatic(world, percept):
         if len(remaining) == 1:
             direction, nr, nc = remaining[0]
             return world.shoot, direction
+        
+    if 'scream' in percept:
+        for rr in range(len(world.mapa)):
+            for cc in range(len(world.mapa[0])):
+                kb.tell(Fact(NOT('wumpus_at', rr, cc)))
+
+    if 'glitter' in percept:
+        return world.pick, None
+
+    if world.got_gold:
+        if world.hero == world.init_hero:
+            return world.climb, None
+
+        back_r, back_c = world.traceback.pop()
+        if back_r < r:
+            return world.move, 'up'
+        if back_r > r:
+            return world.move, 'down'
+        if back_c < c:
+            return world.move, 'left'
+        if back_c > c:
+            return world.move, 'right'
+
+
 
     for direction, dr, dc in moves:
         nr, nc = r + dr, c + dc
@@ -249,16 +251,16 @@ def choose_action_automatic(world, percept):
             if tile['type'] != 'wall' and not tile['visited'] and kb.ask(L('safe', nr, nc)):
                 world.traceback.append((r, c))
                 return world.move, direction
-
-    back_r, back_c = world.traceback.pop()
-    if back_r < r and kb.ask(L('safe', r - 1, c)):
-        return world.move, 'up'
-    if back_r > r and kb.ask(L('safe', r + 1, c)):
-        return world.move, 'down'
-    if back_c < c and kb.ask(L('safe', r, c - 1)):
-        return world.move, 'left'
-    if back_c > c and kb.ask(L('safe', r, c + 1)):
-        return world.move, 'right'
+    if world.traceback:
+        back_r, back_c = world.traceback.pop()
+        if back_r < r:
+            return world.move, 'up'
+        if back_r > r:
+            return world.move, 'down'
+        if back_c < c:
+            return world.move, 'left'
+        if back_c > c:
+            return world.move, 'right'
 
     return world.climb, None
 
@@ -294,7 +296,7 @@ if __name__ == "__main__":
     print_unvisited = False  # Only print the tiles I`ve been to. Make True for debugging
 
     kb = KB()
-    ww = WumpusWorld('mapa2.txt') # TODO you can also try mapa2.txt for a bigger map (or you can design your own)
+    ww = WumpusWorld('mapa7.txt') # TODO you can also try mapa2.txt for a bigger map (or you can design your own)
     kb_initialize(kb, ww)
     ww.play(choose_action_automatic, print_unvisited)
 
