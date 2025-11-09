@@ -71,6 +71,9 @@ class MinimaxPlayer(Player):
         # new_state = game.state_after_move(current_state, some_action)
         # if game.is_terminal(some_state): ...
         # utility = game.utility(some_state, my_player)
+        my_player = game.player_at_turn(state)
+        opponent = game.other_player(my_player)
+        possible_actions = game.actions(state)
         return game.actions(state)[0]
 
 
