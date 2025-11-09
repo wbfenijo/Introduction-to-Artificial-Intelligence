@@ -204,7 +204,6 @@ def choose_action_automatic(world, percept):
         world.traceback.pop()
 
     if 'scream' in percept:
-        world.killed_wumpus = True
         for rr in range(len(world.mapa)):
             for cc in range(len(world.mapa[0])):
                 kb.tell(Fact(NOT('wumpus_at', rr, cc)))
@@ -212,7 +211,7 @@ def choose_action_automatic(world, percept):
     if 'glitter' in percept:
         return world.pick, None
 
-    if world.got_gold and world.killed_wumpus:
+    if world.got_gold:
         if world.hero == world.init_hero:
             return world.climb, None
 
@@ -241,7 +240,6 @@ def choose_action_automatic(world, percept):
 
         if len(remaining) == 1:
             direction, nr, nc = remaining[0]
-            choose_action_automatic.shot = True
             return world.shoot, direction
 
     for direction, dr, dc in moves:
@@ -261,9 +259,6 @@ def choose_action_automatic(world, percept):
         return world.move, 'left'
     if back_c > c and kb.ask(L('safe', r, c + 1)):
         return world.move, 'right'
-
-    if world.hero == world.init_hero:
-        return world.climb, None
 
     return world.climb, None
 
@@ -292,14 +287,14 @@ def kb_add_step(world, percept):
     for p in ['stench', 'breeze', 'glitter']:
         kb.tell(Fact(ParamLiteral(p, r, c, p in percept)))
     kb.tell(Fact(L('safe', r, c)))
-    # kb.print_facts() # useful for debugging
+    #kb.print_facts() # useful for debugging
 
 
 if __name__ == "__main__":
     print_unvisited = False  # Only print the tiles I`ve been to. Make True for debugging
 
     kb = KB()
-    ww = WumpusWorld('mapa2.txt') 
-     # TODO you can also try mapa2.txt for a bigger map (or you can design your own)
+    ww = WumpusWorld('mapa2.txt') # TODO you can also try mapa2.txt for a bigger map (or you can design your own)
     kb_initialize(kb, ww)
     ww.play(choose_action_automatic, print_unvisited)
+

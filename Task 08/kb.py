@@ -44,7 +44,7 @@ class KB:
                 visited.add(key)
 
                 for clause in self.find_clauses_with_conclusion(goal):
-                    if len(clause.premises) == 0:
+                    if len(clause.premises) == 0: #fakt
                         continue
 
                     all_true = True
@@ -54,7 +54,7 @@ class KB:
                             break
 
                     if all_true:
-                        self.tell(Fact(goal))  
+                        self.tell(Fact(goal))  #fakt do KB
                         return True
 
                 return False
@@ -62,7 +62,7 @@ class KB:
         result = backward_chaining(goal_literal, set())
 
         if result:
-            self.tell(Fact(goal_literal))  
+            self.tell(Fact(goal_literal))  #fakt do KB
 
         return result
 
