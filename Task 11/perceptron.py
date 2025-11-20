@@ -9,7 +9,7 @@ class SingleLayerPerceptron:
         self.output_dim = output_dim
 
         # FIXME: initialize the weight matrix with small values
-        self.W = 9
+        self.W = np.random.randn(self.output_dim, self.input_dim + 1)
 
     def add_bias(self, x):
         return np.concatenate([x, [1]])
@@ -19,7 +19,7 @@ class SingleLayerPerceptron:
 
     def compute_output(self, x):
         # FIXME: compute the output (x already includes the bias)
-        return 9
+        return self.sigmoid(self.W @ x)
 
     def compute_accuracy(self, inputs, targets):
         correct = 0
@@ -40,7 +40,7 @@ class SingleLayerPerceptron:
 
         for ep in range(num_epochs):
             # FIXME: slowly decrease the learning rate (starts at alpha_start, ends at alpha_end)
-            alpha = 9
+            alpha = alpha_start -  ep * (alpha_start - alpha_end) / num_epochs 
 
             E_train = 0
 
@@ -49,9 +49,10 @@ class SingleLayerPerceptron:
                 d = targets[:, i]
 
                 # FIXME: compute the output, track the training error and update the weights
-                y = 9
-                E_train += 9
-                self.W += 9
+                y = self.compute_output(x)
+                E_train += np.linalg.norm(d - y) ** 2
+                delta = (d - y) * y * (1 - y)
+                self.W = self.W + alpha * (np.outer(delta,x))
 
             err_hist.append(E_train)
             acc_hist.append(self.compute_accuracy(inputs, targets))
@@ -132,8 +133,8 @@ if __name__ == '__main__':
     plot_training_history(err_hist_slp, acc_hist_slp)
     plot_decision_boundary(slp, inputs, targets, title=f"SLP Decision Boundary ({DATASET})")
 
-    print("\nTraining Multi Layer Perceptron")
-    mlp = MultiLayerPerceptron(inputs.shape[0], hidden_dim=5, output_dim=targets.shape[0])
-    err_hist_mlp, acc_hist_mlp = mlp.train(inputs, targets, num_epochs=150)
-    plot_training_history(err_hist_mlp, acc_hist_mlp)
-    plot_decision_boundary(mlp, inputs, targets, title=f"MLP Decision Boundary ({DATASET})")
+    # print("\nTraining Multi Layer Perceptron")
+    # mlp = MultiLayerPerceptron(inputs.shape[0], hidden_dim=5, output_dim=targets.shape[0])
+    # err_hist_mlp, acc_hist_mlp = mlp.train(inputs, targets, num_epochs=150)
+    # plot_training_history(err_hist_mlp, acc_hist_mlp)
+    # plot_decision_boundary(mlp, inputs, targets, title=f"MLP Decision Boundary ({DATASET})")
