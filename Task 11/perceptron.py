@@ -70,8 +70,8 @@ class MultiLayerPerceptron:
         self.output_dim = output_dim
 
         # FIXME: initialize the weight matrices with small values
-        self.W1 = 9
-        self.W2 = 9
+        self.W1 = np.random.randn(self.hidden_dim, self.input_dim + 1)
+        self.W2 = np.random.randn(self.output_dim, self.hidden_dim + 1)
 
     def add_bias(self, x):
         return np.concatenate([x, [1]])
@@ -133,8 +133,8 @@ if __name__ == '__main__':
     plot_training_history(err_hist_slp, acc_hist_slp)
     plot_decision_boundary(slp, inputs, targets, title=f"SLP Decision Boundary ({DATASET})")
 
-    # print("\nTraining Multi Layer Perceptron")
-    # mlp = MultiLayerPerceptron(inputs.shape[0], hidden_dim=5, output_dim=targets.shape[0])
-    # err_hist_mlp, acc_hist_mlp = mlp.train(inputs, targets, num_epochs=150)
-    # plot_training_history(err_hist_mlp, acc_hist_mlp)
-    # plot_decision_boundary(mlp, inputs, targets, title=f"MLP Decision Boundary ({DATASET})")
+    print("\nTraining Multi Layer Perceptron")
+    mlp = MultiLayerPerceptron(inputs.shape[0], hidden_dim=5, output_dim=targets.shape[0])
+    err_hist_mlp, acc_hist_mlp = mlp.train(inputs, targets, num_epochs=150)
+    plot_training_history(err_hist_mlp, acc_hist_mlp)
+    plot_decision_boundary(mlp, inputs, targets, title=f"MLP Decision Boundary ({DATASET})")
