@@ -81,7 +81,9 @@ class KMeans:
             if stochastic:
                 for px_i in np.random.permutation(num_pixels):
                     pixel_color = self.pixels[px_i]
-                    # ...
+                    center_index = self.find_best_center(pixel_color)
+                    self.centers[center_index] += alpha * (pixel_color - self.centers[center_index])
+                    
 
             else:
                 clusters = self.split_pixels_to_clusters(num_centers)
@@ -91,7 +93,8 @@ class KMeans:
         # Find center that is closest to a given pixel_color.
         # Return index of the center, not its color.
         # # # YOUR CODE GOES HERE - OPTIONAL # # #
-        return 0
+        distances = np.linalg.norm(self.centers - pixel_color, axis=1)
+        return np.argmin(distances) 
 
     def split_pixels_to_clusters(self, num_clusters):
         # Split pixels into num_clusters clusters
@@ -112,5 +115,5 @@ if __name__ == '__main__':
              ]
     for f in files:
         k = KMeans(f)
-        k.k_means(num_centers=5, num_iterations=3, stochastic=False)
+        k.k_means(num_centers=5, num_iterations=3, stochastic=True)
         k.posterize()
