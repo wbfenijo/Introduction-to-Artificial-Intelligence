@@ -87,7 +87,9 @@ class KMeans:
 
             else:
                 clusters = self.split_pixels_to_clusters(num_centers)
-                # ...
+                for i, cluster in enumerate(clusters):
+                    if len(cluster) > 0:
+                        self.centers[i] = np.mean(cluster, axis=0)
 
     def find_best_center(self, pixel_color):
         # Find center that is closest to a given pixel_color.
@@ -101,8 +103,8 @@ class KMeans:
         # # # YOUR CODE GOES HERE - OPTIONAL # # #
         clusters = [[] for _ in range(num_clusters)]
         for pixel_color in self.pixels:
-            # ...
-            pass
+            center_index = self.find_best_center(pixel_color)
+            clusters[center_index].append(pixel_color)
         return clusters
 
 
