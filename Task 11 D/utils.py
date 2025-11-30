@@ -110,14 +110,3 @@ def load_data(file_path):
     targets = data[:, 2].reshape(1, -1) 
     return inputs, targets
 
-def split_data(inputs, targets, train_ratio=0.8, seed=42):
-    np.random.seed(seed) 
-    num_samples = inputs.shape[1]
-    indices = np.arange(num_samples)
-    np.random.shuffle(indices)
-    split_point = int(num_samples * train_ratio)
-    train_inputs = inputs[:, indices[:split_point]]
-    train_targets = targets[:, indices[:split_point]]
-    val_inputs = inputs[:, indices[split_point:]]
-    val_targets = targets[:, indices[split_point:]]
-    return train_inputs, train_targets, val_inputs, val_targets
