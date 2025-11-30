@@ -136,10 +136,12 @@ if __name__ == '__main__':
     # plot_training_history(err_hist_mlp, acc_hist_mlp)
     # plot_decision_boundary(mlp, train_inputs, train_outputs, title=f"MLP Decision Boundary")
 
+    end = time.time()
+    print(f"{int((end - start) // 60)}:{(end - start) % 60:05.2f}")
+
     #print(mlp.evaluate(EVAL_FILE_NAME))
     print(f"Average error for evaluation file is {mlp.evaluate(EVAL_FILE_NAME)}")
 
-    end = time.time()
-    print(f"{int((end - start) // 60)}:{(end - start) % 60:05.2f}")
+
 
 
