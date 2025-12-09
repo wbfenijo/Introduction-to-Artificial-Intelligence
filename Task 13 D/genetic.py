@@ -11,6 +11,9 @@ def sigmoid(x):
     return 1/(1+np.exp(-x))
 
 
+def tanh(x):
+    return np.tanh(x)
+
 class Car:
     def __init__(self, position=(0, 0), orientation=0, additional_scale=1):
         self.center, self.orientation = np.array(position, dtype=float), orientation
