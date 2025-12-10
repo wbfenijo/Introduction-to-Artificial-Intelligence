@@ -76,13 +76,13 @@ class MyCar(Car):
     def update_parameters(self, instructions):
         # # # YOUR CODE GOES HERE # # #
         # use the values outputted from the neural network (instructions) to change the speed and turn of the car.
-        # In order to be safe, the cars also have speed limit (self.speed_limit[]), to prevent accidents. You are
+        # In order to be safe, the cars also have speed limit (self.speed_limit[]), to prevent accidents. You are 
         # advised to incorporate it into the code. Similarly, self.turn_limit prevents huge turns at a given time.
 
-        speed_change = instructions[0] * 0.5 
+        speed_change = np.clip(instructions[0], -self.max_speed_change, self.max_speed_change)
         self.speed += speed_change
         
-        turn_change = instructions[1] * 5.0
+        turn_change = np.clip(instructions[1] * 3, -self.max_turn_change, self.max_turn_change)
         self.turn += turn_change
 
         min_speed, max_speed = self.speed_limit
@@ -114,8 +114,8 @@ if __name__ == '__main__':
     track = create_track()
 
     # useful parameters to play with:
-    population_size = 24       # total population size used for training
-    select_top = 6              # during selection, only the best select_top cars are chosen as parents
+    population_size = 16       # total population size used for training
+    select_top = 4              # during selection, only the best select_top cars are chosen as parents
 
     show_training = True        # each generation is shown on canvas
     show_all_cars = False       # the code is faster if not all cars are always displayed
